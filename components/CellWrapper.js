@@ -2,21 +2,24 @@
 
 import React, {
   Component,
-  PropTypes
+  PropTypes,
 } from 'react';
 import ReactNative, {
-  View
+  View,
 } from 'react-native';
 
 export default class CellWrapper extends Component {
+
+
   componentDidMount() {
-    this.props.updateTag && this.props.updateTag(ReactNative.findNodeHandle(this.refs.view), this.props.sectionId);
+    this.references = {};
+    this.props.updateTag && this.props.updateTag(ReactNative.findNodeHandle(this.references.view), this.props.sectionId);
   }
 
   render() {
     const Cell = this.props.component;
     return (
-      <View ref='view'>
+      <View ref={(ref) => (this.references.view = ref)}>
         <Cell {...this.props} />
       </View>
     );
@@ -30,7 +33,7 @@ CellWrapper.propTypes = {
    */
   sectionId: PropTypes.oneOfType([
     PropTypes.number,
-    PropTypes.string
+    PropTypes.string,
   ]),
 
   /**
@@ -41,6 +44,6 @@ CellWrapper.propTypes = {
   /**
    * A function used to propagate the root nodes handle back to the parent
    */
-  updateTag: PropTypes.func
+  updateTag: PropTypes.func,
 
 };

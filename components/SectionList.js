@@ -1,22 +1,17 @@
 'use strict';
 
 import React, {
-  Component,
   PropTypes,
 } from 'react';
-import ReactNative, {
+import {
   StyleSheet,
   View,
   Text,
-  NativeModules,
 } from 'react-native';
 
-const { UIManager } = NativeModules;
-
-const noop = () => {};
 const returnTrue = () => true;
 
-export default class SectionList extends Component {
+export default class SectionList extends React.Component {
 
   constructor(props, context) {
     super(props, context);
@@ -25,6 +20,7 @@ export default class SectionList extends Component {
     this.resetSection = this.resetSection.bind(this);
     this.detectAndScrollToSection = this.detectAndScrollToSection.bind(this);
     this.lastSelectedIndex = null;
+    this.references = {};
   }
 
   onSectionSelect(sectionId, fromTouch) {
@@ -41,24 +37,9 @@ export default class SectionList extends Component {
 
   detectAndScrollToSection(e) {
     const ev = e.nativeEvent.touches[0];
-    //var rect = {width:1, height:1, x: ev.locationX, y: ev.locationY};
-    //var rect = [ev.locationX, ev.locationY];
-
-    //UIManager.measureViewsInRect(rect, e.target, noop, (frames) => {
-    //  if (frames.length) {
-    //    var index = frames[0].index;
-    //    if (this.lastSelectedIndex !== index) {
-    //      this.lastSelectedIndex = index;
-    //      this.onSectionSelect(this.props.sections[index], true);
-    //    }
-    //  }
-    //});
-    //UIManager.findSubviewIn(e.target, rect, viewTag => {
-      //this.onSectionSelect(view, true);
-    //})
     const targetY = ev.pageY;
-    const { y, width, height } = this.measure;
-    if(!y || targetY < y){
+    const {y, width, height} = this.measure;
+    if (!y || targetY < y) {
       return;
     }
     let index = Math.floor((targetY - y) / height);
@@ -70,19 +51,18 @@ export default class SectionList extends Component {
   }
 
   fixSectionItemMeasure() {
-    const sectionItem = this.refs.sectionItem0;
+    const sectionItem = this.references.sectionItem0;
     if (!sectionItem) {
       return;
     }
     this.measureTimer = setTimeout(() => {
       sectionItem.measure((x, y, width, height, pageX, pageY) => {
-        //console.log([x, y, width, height, pageX, pageY]);
         this.measure = {
           y: pageY,
           width,
-          height
+          height,
         };
-      })
+      });
     }, 0);
   }
 
@@ -90,7 +70,7 @@ export default class SectionList extends Component {
     this.fixSectionItemMeasure();
   }
 
-  // fix bug when change data 
+  // fix bug when change data
   componentDidUpdate() {
     this.fixSectionItemMeasure();
   }
@@ -120,31 +100,20 @@ export default class SectionList extends Component {
           <Text style={[textStyle, this.props.fontStyle]}>{title}</Text>
         </View>;
 
-      //if(index){
-        return (
-          <View key={index} ref={'sectionItem' + index} pointerEvents="none">
-            {child}
-          </View>
-        );
-      //}
-      //else{
-      //  return (
-      //    <View key={index} ref={'sectionItem' + index} pointerEvents="none"
-      //          onLayout={e => {console.log(e.nativeEvent.layout)}}>
-      //      {child}
-      //    </View>
-      //  );
-      //
-      //}
+      return (
+        <View key={index} ref={(ref) => (this.references['sectionItem' + index] = ref)} pointerEvents="none">
+          {child}
+        </View>
+      );
     });
 
     return (
-      <View ref="view" style={[styles.container, this.props.style]}
-        onStartShouldSetResponder={returnTrue}
-        onMoveShouldSetResponder={returnTrue}
-        onResponderGrant={this.detectAndScrollToSection}
-        onResponderMove={this.detectAndScrollToSection}
-        onResponderRelease={this.resetSection}
+      <View ref={(ref) => (this.references.view = ref)} style={[styles.container, this.props.style]}
+            onStartShouldSetResponder={returnTrue}
+            onMoveShouldSetResponder={returnTrue}
+            onResponderGrant={this.detectAndScrollToSection}
+            onResponderMove={this.detectAndScrollToSection}
+            onResponderRelease={this.resetSection}
       >
         {sections}
       </View>
@@ -195,24 +164,24 @@ const styles = StyleSheet.create({
   container: {
     position: 'absolute',
     backgroundColor: 'transparent',
-    alignItems:'flex-end',
-    justifyContent:'center',
+    alignItems: 'flex-end',
+    justifyContent: 'center',
     right: 5,
     top: 0,
-    bottom: 0
+    bottom: 0,
   },
 
   item: {
-    padding: 0
+    padding: 0,
   },
 
   text: {
     fontWeight: '700',
-    color: '#008fff'
+    color: '#008fff',
   },
 
   inactivetext: {
     fontWeight: '700',
-    color: '#CCCCCC'
-  }
+    color: '#CCCCCC',
+  },
 });
