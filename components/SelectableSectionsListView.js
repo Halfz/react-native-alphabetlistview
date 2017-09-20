@@ -7,6 +7,7 @@ import React, {
 import ReactNative, {
   ListView,
   StyleSheet,
+  NativeModules,
   View,
 } from 'react-native';
 import merge from 'merge';
@@ -15,11 +16,13 @@ import SectionHeader from './SectionHeader';
 import SectionList from './SectionList';
 import CellWrapper from './CellWrapper';
 
+const UIManager = NativeModules.UIManager;
+
 export default class SelectableSectionsListView extends React.Component {
 
   constructor(props, context) {
     super(props, context);
-
+    this.references = {};
     this.state = {
       dataSource: new ListView.DataSource({
         rowHasChanged: (row1, row2) => row1 !== row2,
@@ -255,7 +258,7 @@ export default class SelectableSectionsListView extends React.Component {
     return (
       <View ref={(ref) => (this.references.view = ref)} style={[styles.container, this.props.style]}>
         <ListView
-          ref="listview"
+          ref={(ref) => (this.references.listview = ref)}
           {...props}
         />
         {sectionList}

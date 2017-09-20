@@ -1,7 +1,6 @@
 'use strict';
 
 import React, {
-  Component,
   PropTypes
 } from 'react';
 import ReactNative, {
@@ -9,10 +8,14 @@ import ReactNative, {
   Text
 } from 'react-native';
 
-export default class SectionHeader extends Component {
+export default class SectionHeader extends React.Component {
+
+  constructor(props, context) {
+    super(props, context);
+    this.references = {};
+  }
 
   componentDidMount() {
-    this.references = {};
     this.props.updateTag && this.props.updateTag(ReactNative.findNodeHandle(this.references.view), this.props.sectionId);
   }
 

@@ -1,18 +1,21 @@
 'use strict';
 
 import React, {
-  Component,
   PropTypes,
 } from 'react';
 import ReactNative, {
   View,
 } from 'react-native';
 
-export default class CellWrapper extends Component {
+export default class CellWrapper extends React.Component {
 
+  constructor(props, context) {
+    super(props, context);
+
+    this.references = {};
+  }
 
   componentDidMount() {
-    this.references = {};
     this.props.updateTag && this.props.updateTag(ReactNative.findNodeHandle(this.references.view), this.props.sectionId);
   }
 
