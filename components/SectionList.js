@@ -1,13 +1,12 @@
 'use strict';
 
-import React, {
-  PropTypes,
-} from 'react';
+import React from 'react';
 import {
   StyleSheet,
   View,
   Text,
 } from 'react-native';
+import PropTypes from 'prop-types';
 
 const returnTrue = () => true;
 

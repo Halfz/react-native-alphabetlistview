@@ -1,11 +1,10 @@
 'use strict';
 
-import React, {
-  PropTypes,
-} from 'react';
+import React from 'react';
 import ReactNative, {
-  View,
+    View,
 } from 'react-native';
+import PropTypes from 'prop-types';
 
 export default class CellWrapper extends React.Component {
 
