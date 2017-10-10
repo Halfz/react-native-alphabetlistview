@@ -28,8 +28,10 @@ export default class SelectableSectionsListView extends React.Component {
         sectionHeaderHasChanged: (prev, next) => prev !== next,
       }),
       offsetY: 0,
+      sectionListHidden: false,
     };
 
+    this.setSectionListHidden = this.setSectionListHidden.bind(this);
     this.renderFooter = this.renderFooter.bind(this);
     this.renderHeader = this.renderHeader.bind(this);
     this.renderRow = this.renderRow.bind(this);
@@ -109,7 +111,7 @@ export default class SelectableSectionsListView extends React.Component {
       const index = keys.indexOf(section);
 
       let numcells = 0;
-      for (var i = 0; i < index; i++) {
+      for (let i = 0; i < index; i++) {
         numcells += this.props.data[keys[i]].length;
       }
 
@@ -203,10 +205,23 @@ export default class SelectableSectionsListView extends React.Component {
     }
   }
 
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.sectionListHidden !== undefined) {
+      this.setSectionListHidden(nextProps.sectionListHidden);
+    }
+  }
+
+  setSectionListHidden(isHidden) {
+    if (this.state.sectionListHidden !== isHidden) {
+      this.setState({
+        sectionListHidden: isHidden,
+      });
+    }
+  }
+
   render() {
     const {data} = this.props;
     const dataIsArray = Array.isArray(data);
-    let sectionList;
     let renderSectionHeader;
     let dataSource;
     let sections = Object.keys(data);
@@ -216,20 +231,8 @@ export default class SelectableSectionsListView extends React.Component {
     }
 
     if (dataIsArray) {
-      dataSource = this.state.dataSource.cloneWithRows(data);
+      dataSource = this.state.dataSource.cloneWithRows(data, null);
     } else {
-      sectionList = !this.props.hideSectionList ?
-        <SectionList
-          style={this.props.sectionListStyle}
-          onSectionSelect={this.scrollToSection}
-          sections={sections}
-          data={data}
-          getSectionListTitle={this.props.getSectionListTitle}
-          component={this.props.sectionListItem}
-          fontStyle={this.props.sectionListFontStyle}
-        /> :
-        null;
-
       renderSectionHeader = this.renderSectionHeader;
       dataSource = this.state.dataSource.cloneWithRowsAndSections(data, sections);
     }
@@ -260,7 +263,15 @@ export default class SelectableSectionsListView extends React.Component {
           ref={(ref) => (this.references.listview = ref)}
           {...props}
         />
-        {sectionList}
+        {this.state.sectionListHidden || dataIsArray === false ? null : <SectionList
+          style={this.props.sectionListStyle}
+          onSectionSelect={this.scrollToSection}
+          sections={sections}
+          data={data}
+          getSectionListTitle={this.props.getSectionListTitle}
+          component={this.props.sectionListItem}
+          fontStyle={this.props.sectionListFontStyle}
+        />}
       </View>
     );
   }
